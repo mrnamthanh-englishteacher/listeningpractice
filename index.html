@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>✨ KHẢO BÀI TỪ VỰNG ✨</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:linear-gradient(135deg,#ffe6f0,#e0f7fa);
+  margin:0;padding:0;
+}
+
+.container{
+  max-width:900px;
+  margin:30px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+h1{
+  text-align:center;
+  color:#ff4da6;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:15px;
+}
+
+#username{
+  padding:10px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  width:60%;
+  text-align:center;
+}
+
+#timer{
+  text-align:center;
+  font-size:18px;
+  margin:10px;
+}
+
+.question{
+  background:#f9f9f9;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:12px;
+}
+
+.unanswered{
+  border:2px solid red;
+  background:#fff0f0;
+}
+
+.answers label{
+  display:block;
+  margin:5px 0;
+  cursor:pointer;
+}
+
+button{
+  display:block;
+  margin:20px auto;
+  padding:12px 25px;
+  border:none;
+  border-radius:25px;
+  background:#ff4da6;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+
+#result{
+  margin-top:20px;
+}
+
+#leaderboard{
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body oncontextmenu="return false;">
+
+<div class="container">
+
+<h1>✨ KHẢO BÀI TỪ VỰNG TOEIC PHẦN 2 ✨</h1>
+
+<div class="header">
+<input id="username" placeholder="Nhập tên của bạn...">
+</div>
+
+<div id="timer">⏳ 25:00</div>
+
+<div id="quiz"></div>
+
+<button onclick="submitQuiz()">Nộp bài</button>
+
+<div id="result"></div>
+
+<h3>🏆 Bảng xếp hạng</h3>
+<div id="leaderboard"></div>
+
+</div>
+
+<script>
+let tabSwitchCount = 0; 
+
+document.addEventListener("visibilitychange", function() {
+  if (document.hidden) {
+    tabSwitchCount++;
+
+    alert("⚠️ Bạn đã rời tab (" + tabSwitchCount + " lần)");
+
+    if(tabSwitchCount >= 3){
+      alert("❌ Bạn rời tab quá nhiều!");
+      submitQuiz();
+    }
+  }
+});
+
+// 🔀 random
+function shuffle(arr){
+  return arr.sort(()=>Math.random()-0.5);
+}
+
+// 📚 DATA
+let originalQuestions = [
+{
+q: "Please confirm your ______ before the package is shipped.",
+a: [
+"shipping address",
+"billing problem",
+"customer service center",
+"career"
+],
+c: 0
+},
+{
+q: "Before turning on the monitor, make sure to ______ the power cable.",
+a: [
+"register",
+"plug in",
+"broadcast",
+"deny facts"
+],
+c: 1
+},
+{
+q: "Our technicians keep extra ______ in stock for computer repairs.",
+a: [
+"office equipment",
+"computer components",
+"hiking clothes",
+"air pollution"
+],
+c: 1
+},
+{
+q: "The manufacturer can provide ______ if your machine is no longer working properly.",
+a: [
+"shipping fees",
+"revised reports",
+"replacement parts",
+"cafeterias"
+],
+c: 2
+},
+{
+q: "Customers requesting a refund must present the ______.",
+a: [
+"original receipt",
+"remaining seat",
+"committee member",
+"career"
+],
+c: 0
+},
+{
+q: "If you notice a ______ on your credit card statement, please contact us immediately.",
+a: [
+"scheduled meeting",
+"billing problem",
+"workshop",
+"application"
+],
+c: 1
+},
+{
+q: "For urgent orders, we recommend choosing ______.",
+a: [
+"trial period",
+"express delivery",
+"maintenance",
+"broadcast"
+],
+c: 1
+},
+{
+q: "Orders over $100 qualify for free ______.",
+a: [
+"shipping fee",
+"maintenance",
+"inventory",
+"career"
+],
+c: 0
+},
+{
+q: "If the product arrives damaged, you may request a full ______.",
+a: [
+"refund",
+"agreement",
+"feature",
+"facility"
+],
+c: 0
+},
+{
+q: "Please contact our ______ if you need additional assistance.",
+a: [
+"customer service center",
+"faculty",
+"committee member",
+"historical place"
+],
+c: 0
+},
+{
+q: "Graduates in software engineering have a ______ in the technology sector.",
+a: [
+"promising future",
+"billing problem",
+"shipping address",
+"cafeteria"
+],
+c: 0
+},
+{
+q: "The manager emailed the ______ to every department yesterday.",
+a: [
+"existing machine",
+"revised document",
+"remaining seat",
+"working-hour system"
+],
+c: 1
+},
+{
+q: "Although the assignment was difficult, everyone enjoyed the ______.",
+a: [
+"challenging task",
+"air pollution",
+"committee member",
+"shipping fee"
+],
+c: 0
+},
+{
+q: "Volunteering overseas was a truly ______ for all participants.",
+a: [
+"rewarding experience",
+"billing problem",
+"computer components",
+"original receipt"
+],
+c: 0
+},
+{
+q: "The hotel receptionist handled the ______ with patience and professionalism.",
+a: [
+"demanding guest",
+"historical place",
+"leading manufacturer",
+"career"
+],
+c: 0
+},
+{
+q: "She received an award for her ______ during the sales competition.",
+a: [
+"shipping address",
+"outstanding performance",
+"replacement parts",
+"trial period"
+],
+c: 1
+},
+{
+q: "The accounting department is trying to collect all ______ before the end of the month.",
+a: [
+"attached files",
+"expected results",
+"outstanding debts",
+"limited times"
+],
+c: 2
+},
+{
+q: "Many graduates dream of working for a ______ in the technology industry.",
+a: [
+"leading company",
+"billing problem",
+"reception",
+"application"
+],
+c: 0
+},
+{
+q: "His ______ to become a pilot motivated him to study every day.",
+a: [
+"overwhelming desire",
+"shipping fee",
+"revised report",
+"quantity"
+],
+c: 0
+},
+{
+q: "The factory decided to upgrade the ______ instead of buying a new one.",
+a: [
+"existing machine",
+"complimentary breakfast",
+"committee member",
+"inventory"
+],
+c: 0
+},
+{
+q: "There is only one ______ available on tomorrow morning's flight.",
+a: [
+"remaining seat",
+"attached file",
+"working-hour system",
+"committee member"
+],
+c: 0
+},
+{
+q: "Renewable energy has become a ______ with excellent career opportunities.",
+a: [
+"historical place",
+"fast-growing industry",
+"billing problem",
+"revised document"
+],
+c: 1
+},
+{
+q: "Please submit a ______ before beginning the construction project.",
+a: [
+"scheduled meeting",
+"detailed plan",
+"refund",
+"quantity"
+],
+c: 1
+},
+{
+q: "This special discount is available for a ______ only.",
+a: [
+"limited time",
+"customer service center",
+"inventory",
+"career"
+],
+c: 0
+},
+{
+q: "Passengers should confirm their ______ at least 24 hours before departure.",
+a: [
+"reserved seat",
+"billing problem",
+"replacement parts",
+"committee member"
+],
+c: 0
+},
+{
+q: "The department heads will attend a ______ at 2:00 this afternoon.",
+a: [
+"revised report",
+"scheduled meeting",
+"trial period",
+"application"
+],
+c: 1
+},
+{
+q: "The finance team submitted the ______ after correcting several errors.",
+a: [
+"revised report",
+"remaining seat",
+"feature",
+"shipping fee"
+],
+c: 0
+},
+{
+q: "Please review the ______ before replying to my email.",
+a: [
+"maintenance",
+"attached file",
+"cafeteria",
+"historical place"
+],
+c: 1
+},
+{
+q: "The company is looking for an ______ to supervise new staff.",
+a: [
+"experienced employee",
+"committee member",
+"broadcast",
+"refund"
+],
+c: 0
+},
+{
+q: "Every ______ is inspected before leaving the factory.",
+a: [
+"finished product",
+"trial period",
+"working-hour system",
+"quantity"
+],
+c: 0
+},
+{
+q: "The marketing campaign achieved the ______ ahead of schedule.",
+a: [
+"billing problem",
+"expected result",
+"shipping address",
+"maintenance"
+],
+c: 1
+},
+{
+q: "Automation has helped the factory achieve a significantly ______.",
+a: [
+"limited time",
+"reduced cost",
+"career",
+"reception"
+],
+c: 1
+},
+{
+q: "The audience was highly ______ with the speaker's presentation.",
+a: [
+"satisfying",
+"satisfied",
+"confusing",
+"boring"
+],
+c: 1
+},
+{
+q: "The instructions were so ______ that many customers asked for help.",
+a: [
+"interested",
+"encouraged",
+"confusing",
+"tired"
+],
+c: 2
+},
+{
+q: "Her success story was extremely ______ to young entrepreneurs.",
+a: [
+"encouraging",
+"disappointed",
+"bored",
+"limited"
+],
+c: 0
+},
+{
+q: "The documentary was so ______ that everyone watched it until the end.",
+a: [
+"excited",
+"interesting",
+"tired",
+"confused"
+],
+c: 1
+},
+{
+q: "The manager looked ______ after working overtime all week.",
+a: [
+"tiring",
+"fascinating",
+"tired",
+"encouraging"
+],
+c: 2
+},
+{
+q: "The tour guide gave a ______ explanation of the ancient temple.",
+a: [
+"historical place",
+"fascinating",
+"working-hour system",
+"application"
+],
+c: 1
+},
+{
+q: "Applicants should ______ online before the closing date.",
+a: [
+"apply for a job",
+"vote anonymously",
+"change a password",
+"visit a store"
+],
+c: 0
+},
+{
+q: "Employees are encouraged to ______ innovative ideas during team discussions.",
+a: [
+"quit one's job",
+"argue for",
+"deny facts",
+"disagree with"
+],
+c: 1
+}
+];
+
+
+// 🔀 RANDOM CÂU + ĐÁP ÁN
+let questions = shuffle(originalQuestions.map(q=>{
+  let opts = q.a.map((t,i)=>({t,correct:i===q.c}));
+  opts = shuffle(opts);
+  return {
+    q:q.q,
+    a:opts.map(o=>o.t),
+    c:opts.findIndex(o=>o.correct)
+  };
+}));
+
+// render
+const quizDiv=document.getElementById("quiz");
+
+questions.forEach((q,i)=>{
+  let div=document.createElement("div");
+  div.className="question";
+
+  let html=`${i+1}. ${q.q}`;
+
+  q.a.forEach((ans,idx)=>{
+    html+=`
+    <div class="answers">
+      <label>
+        <input type="radio" name="q${i}" value="${idx}">
+        ${String.fromCharCode(65+idx)}. ${ans}
+      </label>
+    </div>`;
+  });
+
+  div.innerHTML=html;
+  quizDiv.appendChild(div);
+});
+
+// ⏱ timer
+let time=1500;
+let timer=setInterval(()=>{
+  let m=Math.floor(time/60);
+  let s=time%60;
+  document.getElementById("timer").innerText=`⏳ ${m}:${s<10?"0"+s:s}`;
+  time--;
+  if(time<0){clearInterval(timer);submitQuiz();}
+},1000);
+
+// submit
+function submitQuiz(){
+  let name=document.getElementById("username").value.trim();
+  if(!name){alert("Nhập tên!");return;}
+let hasEmpty = false;
+
+// kiểm tra câu chưa làm
+questions.forEach((q,i)=>{
+  let selected=document.querySelector(`input[name=q${i}]:checked`);
+  let div=document.getElementsByClassName("question")[i];
+
+  div.classList.remove("unanswered");
+
+  if(!selected){
+    div.classList.add("unanswered");
+    hasEmpty = true;
+  }
+});
+
+if(hasEmpty){
+  alert("❌ Bạn phải làm hết câu trước khi nộp!");
+  return;
+}
+  clearInterval(timer);
+
+  let score=0;
+  let wrongList=[];
+
+  questions.forEach((q,i)=>{
+    let selected=document.querySelector(`input[name=q${i}]:checked`);
+    if(!selected)return;
+
+    let val=parseInt(selected.value);
+
+    if(val===q.c){
+      score++;
+    } else {
+      wrongList.push({
+        question:q.q,
+        your:String.fromCharCode(65+val)+". "+q.a[val],
+        correct:String.fromCharCode(65+q.c)+". "+q.a[q.c]
+      });
+    }
+  });
+
+  // ⭐ TIME
+  let now = new Date().toLocaleString();
+
+  // hiển thị
+  let wrongRate = wrongList.length / questions.length;
+
+let resultHTML = `
+🎉 <b>${name}</b> đúng <b>${score}/${questions.length}</b><br>
+⏰ ${now}<br>
+⚠️ TabSwitch: ${tabSwitchCount || 0}<br><br>
+`;
+
+if(wrongRate < 0.3){
+
+    resultHTML += `
+    <h3>📚 Đáp án các câu sai</h3>
+    `;
+
+    wrongList.forEach((w,i)=>{
+        resultHTML += `
+        <div style="
+            border:1px solid #ddd;
+            padding:10px;
+            margin-bottom:10px;
+            border-radius:10px;
+            background:#fff8e6;
+        ">
+            <b>Câu ${i+1}</b><br>
+            ${w.question}<br><br>
+
+            ❌ Bạn chọn: <span style="color:red">${w.your}</span><br>
+            ✅ Đáp án: <span style="color:green">${w.correct}</span>
+        </div>
+        `;
+    });
+
+}else{
+
+    resultHTML += `
+    <div style="
+        background:#ffeaea;
+        padding:15px;
+        border-radius:12px;
+        color:#c00000;
+        font-weight:bold;
+    ">
+    ❌ Sai trên 30% mà đòi mấy đáp án của mẹ hả cưng?<br>
+    Học bài kỹ vô bữa sau mẹ khảo lại!
+    </div>
+    `;
+}
+
+document.getElementById("result").innerHTML = resultHTML;
+
+  // ⭐ GỬI DATA FULL
+  fetch("https://script.google.com/macros/s/AKfycbwKGHpjJy1RxNpGRIHdZtQiPfCrh0OSG24DEzQtRB7Ezlr1aki97aZL0JfQiSwkKmYmrg/exec",{
+    method:"POST",
+    body:JSON.stringify({
+      time: now,
+      name: name,
+      score: score,
+      total: questions.length,
+      tabSwitch: tabSwitchCount || 0,
+      wrong: wrongList.map((w,i)=>
+        (i+1)+". "+w.question+
+        " | Bạn chọn: "+w.your+
+        " | Đúng: "+w.correct
+      ).join("\n")
+    })
+  });
+}
+
+</script>
+
+</body>
+</html>
